@@ -37,7 +37,8 @@ $ pm2 start ecosystem.config.js --env production
 
 # deploy to server
 $ git commit
-$ pm2 deploy --env production
+$ pm2 deploy production setup
+$ pm2 deploy production
 ```
 ## Roadmap
 
