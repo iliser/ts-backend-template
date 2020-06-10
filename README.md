@@ -6,10 +6,14 @@ Fastify & TypeScript starter repository.
 
 ## Installation
 
-npx degit iliser\ts-backend-template
-or
+Install without git history
+```bash
+$ npx degit iliser\ts-backend-template
+```
+or 
+```bash
 git clone git@github.com:iliser/ts-backend-template.git
-
+```
 ## Usage
 
 ```bash
