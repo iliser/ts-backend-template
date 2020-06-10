@@ -27,7 +27,7 @@ module.exports = {
       host:["s5.ibb.su"],
       ref:"origin/master",
       // TODO set deploy settings
-      repo:"git@github.com:iliser/vp-backend.git",
+      repo:"git@github.com:iliser/ts-backend-template.git",
       path:"/home/iliser/vp/test-back",
       "post-deploy":"pnpm i && npm run build && pm2 start ecosystem.config.js --env production"
     }

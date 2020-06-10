@@ -1,6 +1,6 @@
 {
     "mongo": {
-        "url": "mongodb://localhost:27017/vp",
+        "url": "mongodb://localhost:27017/test_db",
         "options": {
             "useNewUrlParser": "true"
         }

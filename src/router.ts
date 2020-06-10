@@ -1,11 +1,10 @@
 import config from "config";
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { pinModel, userModel, sellerModel, vehicleModel, orderModel, offerModel, dealModel } from "model";
+import { pinModel, userModel, sellerModel } from "model";
 import { enterPassword, enterPhone, enterPin, jwtAuth, refreshToken } from "routes/auth";
 import { getSession, getUser, updateUser } from "routes/user";
 import { Crud } from "utils/crud/crud";
 import { mongooseAdapter } from "utils/crud/mongooseAdapter";
-import { OfferState } from "model/schema/offer";
 
 
 let crud = Crud(mongooseAdapter);
@@ -89,55 +88,15 @@ export default function router(fastify: FastifyInstance, opts, next) {
     .post("/api/v1/block/user", () => { })
     .post("/api/v1/block/seller", () => { })
 
-  let setAuthUserAsCreator = async (v, req) => {
-    let user = await userModel.findOne({ auth: req.user.auth_id }).lean(true);
-    return ({ ...v, creator: user._id });
-  };
 
   // Vehicles managment
   // TODO add image loading
   let authHasUser = async (req) => (await userModel.findOne({ auth: req.user.auth_id }).lean(true) as any) != null;
-  fastify
-    .get("/api/v1/crud/deal", crud.get(dealModel))
-    .post("/api/v1/crud/deal", crud.post(dealModel, {
-      access: authHasUser,
-      transformData: setAuthUserAsCreator
-    }))
-    .get("/api/v1/crud/deal/count", crud.count(dealModel));
 
-  fastify
-    .get("/api/v1/crud/vehicle", crud.get(vehicleModel))
-    .post("/api/v1/crud/vehicle", crud.post(vehicleModel, {
-      access: authHasUser,
-      transformData: setAuthUserAsCreator
-    }))
-    .patch("/api/v1/crud/vehicle", crud.patch(vehicleModel, {
-      access: async (req) => {
-        let veh: any = await vehicleModel.findById(req.body._id || req.query._id).lean(true);
-        let user = await userModel.findOne({ auth: req.user.auth_id }).lean(true);
-
-        return veh.creator.toString() == user._id.toString();
-      },
-      transformData: setAuthUserAsCreator
-    }))
-    .get("/api/v1/crud/vehicle/count", crud.count(vehicleModel));
-
-  // Order managment
-  // TODO add image, voice loading
-  //# gen from "order<_id>.creator.toString() == user<auth:r.user.auth_id>._id.toString()"
-
-  let orderPatchAccess = async (req) => (await orderModel.findOne({ _id: req.query._id ?? req.body._id }).lean(true) as any).creator.toString() == (await userModel.findOne({ auth: req.user.auth_id }).lean(true) as any)._id.toString()
-  fastify
-    .get("/api/v1/crud/order", crud.get(orderModel))
-    .post("/api/v1/crud/order", crud.post(orderModel, {
-      access: authHasUser,
-      transformData: setAuthUserAsCreator
-    }))
-    .patch("/api/v1/crud/order", crud.patch(orderModel, {
-      access: orderPatchAccess,
-      transformData: setAuthUserAsCreator
-    }))
-    .get("/api/v1/crud/order/count", crud.count(orderModel));
+  let setAuthUserAsCreator = async (v, req) => {
+    let user = await userModel.findOne({ auth: req.user.auth_id }).lean(true);
+    return ({ ...v, creator: user._id });
+  };
 
   // Offer managment
   // TODO add image loading
@@ -148,38 +107,7 @@ export default function router(fastify: FastifyInstance, opts, next) {
     return ({ ...v, creator: user._id });
   };
   // gen from offer<_id>.creator.toString() == seller<auth:r.user.auth_id>._id.toString()
-  let offerPatchAccess = async (req) => (await offerModel.findOne({ _id: req.query._id ?? req.body._id }).lean(true) as any).creator.toString() == (await sellerModel.findOne({ auth: req.user.auth_id }).lean(true) as any)._id.toString()
 
-  let setOfferState = (state: OfferState) => async (req, res) => {
-    const { _id } = req.query;
-    if (!_id) throw "_id field must be set";
-    const [doc, user, seller] = await Promise.all([
-      await offerModel.findById(_id).populate("order"),
-      await userModel.findOne({ auth: (req as any).user.auth_id }).lean(),
-      await sellerModel.findOne({ auth: (req as any).user.auth_id }).lean()
-    ]);
-    if (!doc || !user) res.code(404).send();
-    if ((doc as any).order.creator.toString() != user._id.toString() && (doc as any).creator.toString() != seller._id.toString()) res.code(403).send();
-
-    await doc.set("state", state).save();
-    res.send("OK")
-
-  }
-
-  fastify
-    .get("/api/v1/crud/offer", crud.get(offerModel))
-    .post("/api/v1/crud/offer", crud.post(offerModel, {
-      access: authHasSeller,
-      transformData: setAuthSellerAsCreator
-    }))
-    .patch("/api/v1/crud/offer", crud.patch(offerModel, {
-      access: offerPatchAccess,
-      transformData: setAuthSellerAsCreator
-    }))
-    .get("/api/v1/crud/offer/count", crud.count(offerModel))
-    .post("/api/v1/offer/seen", setOfferState(OfferState.Viewed))
-    .post("/api/v1/offer/lock", setOfferState(OfferState.Reserved))
-    .post("/api/v1/offer/cancel", setOfferState(OfferState.Canceled))
 
   if (config.isDev) {
     fastify.get("/test/v1/session", getSession);

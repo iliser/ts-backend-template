@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "Fastify TypeScript starter repository",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "start": "npm run dev",
     "dev": "cross-env NODE_ENV=development nodemon",
     "debug": "nodemon --config nodemon-debug.json",
