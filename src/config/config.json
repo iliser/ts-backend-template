@@ -1,0 +1,14 @@
+{
+    "mongo": {
+        "url": "mongodb://localhost:27017/vp",
+        "options": {
+            "useNewUrlParser": "true"
+        }
+    },
+    "secret":"Appaksdkasd",
+    "pin":{
+        "maxCount": 3,
+        "resetTime": 5000,
+        "expiresTime": "5m"
+    }
+}
