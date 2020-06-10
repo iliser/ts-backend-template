@@ -1,6 +1,5 @@
 import { defaultMongooseQueryTransform, } from "./queryTransform";
 import { dbMethodOptionType } from "./crud"
-import { vehicleModel } from "model";
 
 
 export let mongooseAdapter = {
