@@ -9,9 +9,9 @@
     "debug": "nodemon --config nodemon-debug.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "build": "rimraf dist && tsc",
-    "prod": "cross-env NODE_ENV=production node -r ./tsconfig-path-bootstrap.js dist/server.js"
+    "prod": "cross-env NODE_ENV=production node dist/server.js"
   },
-  "author": "Matschik <mathieu.schimmerling@protonmail.com>",
+  "author": "iliser <i.d.mvmii@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^4.0.1",

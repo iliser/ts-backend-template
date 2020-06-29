@@ -5,7 +5,7 @@ module.exports = {
     script: 'dist/server.js',
     
     // need to "absolute" import like import config from 'config' work corectly why run from node
-    node_args: '-r ./tsconfig-path-bootstrap.js',
+    node_args: '',
     args: '',
     instances: 1,
     autorestart: true,
